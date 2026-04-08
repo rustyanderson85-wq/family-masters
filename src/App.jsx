@@ -439,6 +439,8 @@ export default function App() {
 
   const loadLiveData = useCallback(async () => {
     if (PROXY_URL==="YOUR_PROXY_URL") return;
+    // Only fetch live player data during tournament week
+    const now = new Date(); const start = new Date("2026-04-10"); if (now < start) return;
     setLoadingLive(true); setLiveError(null);
     try {
       const res=await fetch(`${PROXY_URL}/api/masters?endpoint=leaderboard`);
