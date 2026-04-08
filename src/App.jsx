@@ -624,7 +624,7 @@ export default function App() {
       <div style={{ padding:28 }}>
 
         {/* ── SETUP ── */}
-        {tab===0 && (
+        {tab===3 && (
           <div>
             <h2 style={{ fontFamily:sf, fontSize:L.sectionTitleF, fontWeight:"normal", color:M.green, margin:"0 0 6px" }}>League members</h2>
             <p style={{ fontFamily:ss, fontSize:L.bodyTextF, color:M.textSoft, margin:"0 0 18px" }}>Add everyone participating, then start the draft.</p>
