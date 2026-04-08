@@ -681,7 +681,7 @@ export default function App() {
         )}
 
         {/* ── DRAFT ── */}
-        {tab===1 && (
+        {tab===2 && (
           <div>
             {!draftStarted ? (
               <div style={{ textAlign:"center", padding:"60px 20px", color:M.textSoft, fontSize:14, fontFamily:ss }}>Go to Setup to begin the draft.</div>
@@ -851,7 +851,7 @@ export default function App() {
         )}
 
         {/* ── SCORING ── */}
-        {tab===2 && (
+        {tab===1 && (
           <div>
             <div style={{ display:"flex", gap:8, marginBottom:18, flexWrap:"wrap" }}>
               {["all",...members].map(m=>(
