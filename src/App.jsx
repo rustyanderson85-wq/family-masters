@@ -459,6 +459,32 @@ export default function App() {
   }, []);
 
   useEffect(() => { loadLiveData(); const iv=setInterval(loadLiveData,REFRESH_MS); return ()=>clearInterval(iv); }, [loadLiveData]);
+
+  // Load shared state on mount
+  useEffect(() => {
+    if (PROXY_URL === "YOUR_PROXY_URL") return;
+    fetch(`${PROXY_URL}/api/state`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.members)      setMembers(data.members);
+        if (data.drafts)       setDrafts(data.drafts);
+        if (data.draftOrder)   setDraftOrder(data.draftOrder);
+        if (data.currentPick !== undefined) setCurrentPick(data.currentPick);
+        if (data.draftStarted !== undefined) setDraftStarted(data.draftStarted);
+        if (data.playerStats)  setPlayerStats(data.playerStats);
+      })
+      .catch(e => console.error("State load error:", e));
+  }, []);
+
+  // Save state helper
+  const saveState = (patch) => {
+    if (PROXY_URL === "YOUR_PROXY_URL") return;
+    fetch(`${PROXY_URL}/api/state`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    }).catch(e => console.error("State save error:", e));
+  };
   useEffect(() => { if(feedRef.current) feedRef.current.scrollTop=feedRef.current.scrollHeight; }, [commentary]);
 
   const allPicks = (() => {
@@ -522,6 +548,8 @@ export default function App() {
     setDraftOrder(order); setDraftStarted(true); setCurrentPick(0);
     setDrafts(Object.fromEntries(members.map(m=>[m,[]])));
     setCommentary([]); setPendingPick(null); setTimeLeft(PICK_SECONDS); setTab(1);
+    const order2 = [...members].sort(()=>Math.random()-0.5);
+    saveState({ members, drafts: {}, draftOrder: order2, currentPick: 0, draftStarted: true, playerStats: {} });
   };
 
   const confirmPick = () => {
@@ -532,6 +560,7 @@ export default function App() {
     setDrafts(newDrafts); setCurrentPick(p=>p+1); setSearch(""); setFilterReq(null);
     generateCommentary(member,pendingPick,newDrafts,currentPick+1);
     setPendingPick(null);
+    saveState({ members, drafts: newDrafts, draftOrder, currentPick: currentPick+1, draftStarted, playerStats });
   };
 
   const getTeamPoints = (m) => (drafts[m]||[]).reduce((s,p)=>s+calcPoints(playerStats[p.id]),0);
@@ -542,7 +571,7 @@ export default function App() {
     if (val===0) delete rd[`h${h}`]; else rd[`h${h}`]=val;
     return {...prev,[pid]:{...cur,[rk]:rd}};
   });
-  const toggleStat = (pid,stat) => setPlayerStats(prev=>{ const c=prev[pid]||{}; return {...prev,[pid]:{...c,[stat]:!c[stat]}}; });
+  const toggleStat = (pid,stat) => setPlayerStats(prev=>{ const c=prev[pid]||{}; const next={...prev,[pid]:{...c,[stat]:!c[stat]}}; saveState({ members, drafts, draftOrder, currentPick, draftStarted, playerStats: next }); return next; });
   const toggleLowRound = (pid,key) => setPlayerStats(prev=>{ const u={...prev}; Object.keys(u).forEach(id=>{if(u[id]?.[key])u[id]={...u[id],[key]:false};}); u[pid]={...(u[pid]||{}),[key]:!(prev[pid]?.[key])}; return u; });
 
   const allRosteredPlayers = [...new Map(Object.values(drafts).flatMap(p=>(p||[])).map(p=>[p.id,p])).values()];
