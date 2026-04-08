@@ -507,13 +507,17 @@ export default function App() {
     const otherTeams=Object.entries(allDrafts).filter(([m])=>m!==picker&&(allDrafts[m]||[]).length>0).map(([m,picks])=>`${m}: ${(picks||[]).map(p=>p.name).join(", ")}`).join(" | ");
     const prompt=`You're a sharp, funny golf analyst covering a family fantasy Masters draft. React in 2-3 sentences max. Witty and sassy.\n\n${picker} picked ${picked.name} (${picked.odds})${picked.isFormerChamp?" — former champ":""}${picked.isMastersRookie?" — Masters rookie":""}. Team so far: ${teamSoFar.length?teamSoFar.join(", "):"just this pick"}. Passed on: ${topSkipped}. Others: ${otherTeams||"none yet"}.\n\nPunchy. Roast the pick, mention who they passed on, make a quick prediction.`;
     try {
-      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
-      const data=await res.json();
-      setCommentary(prev=>[...prev,{picker,picked:picked.name,text:data.content?.[0]?.text||"No comment.",pickNum}]);
-    } catch(e) {
-      setCommentary(prev=>[...prev,{picker,picked:picked.name,text:"The analyst stepped away. Suspicious timing.",pickNum}]);
-    } finally { setAiLoading(false); }
-  };
+  const res = await fetch(`${PROXY_URL}/api/commentary`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt }),
+  });
+  const data = await res.json();
+  const text = data.text || "No comment.";
+  setCommentary(prev => [...prev, { picker, picked: picked.name, text, pickNum }]);
+} catch(e) {
+  setCommentary(prev => [...prev, { picker, picked: picked.name, text: "The analyst stepped away. Suspicious timing.", pickNum }]);
+} finally { setAiLoading(false); }
 
   const startDraft = () => {
     const order=[...members].sort(()=>Math.random()-0.5);
