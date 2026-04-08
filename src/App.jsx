@@ -509,7 +509,7 @@ export default function App() {
     try {
       const res=await fetch(`${PROXY_URL}/api/commentary`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
       const data=await res.json();
-      setCommentary(prev=>[...prev,{picker,picked:picked.name,text:data.content?.[0]?.text||"No comment.",pickNum}]);
+      setCommentary(prev=>[...prev,{picker,picked:picked.name,text:data.text||"No comment.",pickNum}]);
     } catch(e) {
       setCommentary(prev=>[...prev,{picker,picked:picked.name,text:"The analyst stepped away. Suspicious timing.",pickNum}]);
     } finally { setAiLoading(false); }
@@ -857,3 +857,4 @@ export default function App() {
     </div>
   );
 }// Tue Apr  7 21:58:31 EDT 2026
+// updated Tue Apr  7 21:58:41 EDT 2026
