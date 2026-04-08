@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
-const PROXY_URL = "YOUR_PROXY_URL";
+const PROXY_URL = "https://family-masters.vercel.app";
 const REFRESH_MS = 5 * 60 * 1000;
 const TOTAL_PICKS = 4;
 const PICK_SECONDS = 150;
