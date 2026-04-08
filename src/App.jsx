@@ -419,7 +419,7 @@ const TABS = ["Leaderboard","Scoring","Draft","Setup"];
 // ── App ───────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [tab, setTab]                   = useState(0);
+  const [tab, setTab]                   = useState(0); // 0=Leaderboard, 1=Scoring, 2=Draft, 3=Setup
   const [members, setMembers]           = useState(SAMPLE_MEMBERS);
   const [newMember, setNewMember]       = useState("");
   const [drafts, setDrafts]             = useState({});
@@ -681,7 +681,7 @@ export default function App() {
         )}
 
         {/* ── DRAFT ── */}
-        {tab===2 && (
+        {tab===1 && (
           <div>
             {!draftStarted ? (
               <div style={{ textAlign:"center", padding:"60px 20px", color:M.textSoft, fontSize:14, fontFamily:ss }}>Go to Setup to begin the draft.</div>
@@ -851,7 +851,7 @@ export default function App() {
         )}
 
         {/* ── SCORING ── */}
-        {tab===1 && (
+        {tab===2 && (
           <div>
             <div style={{ display:"flex", gap:8, marginBottom:18, flexWrap:"wrap" }}>
               {["all",...members].map(m=>(
