@@ -63,7 +63,12 @@ function assignRequirements(picks) {
 
 function unmetRequirements(picks) {
   const a = assignRequirements(picks);
-  return REQUIREMENTS.filter(r=>a[r.id]===null).map(r=>r.id);
+  // A requirement is met if any pick satisfies it, regardless of assignment
+  return REQUIREMENTS.filter(r => {
+    if (a[r.id] !== null) return false; // assigned
+    // Also check if any pick can satisfy it even if assigned elsewhere
+    return !picks.some(p => playerReqs(p).has(r.id));
+  }).map(r=>r.id);
 }
 
 function playerIsUseful(player, currentPicks) {
