@@ -414,7 +414,7 @@ const SAMPLE_PLAYERS = [
 ];
 
 const SAMPLE_MEMBERS = ["Daddy","Mommy","Luke","Brooklynn","Lexi","Pop","Mor Mor"];
-const TABS = ["Setup","Draft","Scoring","Leaderboard"];
+const TABS = ["Leaderboard","Scoring","Draft","Setup"];
 
 // ── App ───────────────────────────────────────────────────────────────────────
 
@@ -553,7 +553,7 @@ export default function App() {
     const order=[...members].sort(()=>Math.random()-0.5);
     setDraftOrder(order); setDraftStarted(true); setCurrentPick(0);
     setDrafts(Object.fromEntries(members.map(m=>[m,[]])));
-    setCommentary([]); setPendingPick(null); setTimeLeft(PICK_SECONDS); setTab(1);
+    setCommentary([]); setPendingPick(null); setTimeLeft(PICK_SECONDS); setTab(2);
     const order2 = [...members].sort(()=>Math.random()-0.5);
     saveState({ members, drafts: {}, draftOrder: order2, currentPick: 0, draftStarted: true, playerStats: {} });
   };
@@ -681,7 +681,7 @@ export default function App() {
         )}
 
         {/* ── DRAFT ── */}
-        {tab===1 && (
+        {tab===2 && (
           <div>
             {!draftStarted ? (
               <div style={{ textAlign:"center", padding:"60px 20px", color:M.textSoft, fontSize:14, fontFamily:ss }}>Go to Setup to begin the draft.</div>
@@ -851,7 +851,7 @@ export default function App() {
         )}
 
         {/* ── SCORING ── */}
-        {tab===2 && (
+        {tab===1 && (
           <div>
             <div style={{ display:"flex", gap:8, marginBottom:18, flexWrap:"wrap" }}>
               {["all",...members].map(m=>(
@@ -883,7 +883,7 @@ export default function App() {
         )}
 
         {/* ── LEADERBOARD ── */}
-        {tab===3 && (
+        {tab===0 && (
           <div>
             {leaderboard.map((member,i)=>{ const pts=getTeamPoints(member); const picks=drafts[member]||[]; const isLeader=i===0; return (
               <div key={member} style={{ background:M.white, border:`${isLeader?"1.5px":"0.5px"} solid ${isLeader?M.gold:M.border}`, borderRadius:10, overflow:"hidden", marginBottom:12 }}>
