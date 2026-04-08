@@ -629,6 +629,18 @@ export default function App() {
             </div>
             <button onClick={startDraft} style={{ width:"100%", padding:"18px", fontSize:18, fontFamily:sf, background:M.green, color:M.gold, border:`1px solid ${M.gold}40`, borderRadius:10, cursor:"pointer" }}>
               {draftStarted?"Draft in progress →":`Begin Draft · ${members.length} participants`}
+            {draftStarted && (
+              <button onClick={()=>{
+                if(window.confirm("Reset the entire draft? This cannot be undone.")) {
+                  fetch(`${PROXY_URL}/api/state`, {method:"DELETE"});
+                  setDrafts({}); setDraftOrder([]); setCurrentPick(0);
+                  setDraftStarted(false); setPlayerStats({});
+                  setCommentary([]); setPendingPick(null); setTimeLeft(PICK_SECONDS);
+                }
+              }} style={{ width:"100%", padding:"12px", fontSize:13, fontFamily:ss, background:"none", color:"#8a2020", border:"0.5px solid #8a2020", borderRadius:8, cursor:"pointer", marginTop:10 }}>
+                Reset draft
+              </button>
+            )}
             </button>
           </div>
         )}
