@@ -438,6 +438,7 @@ export default function App() {
   const [aiLoading, setAiLoading]       = useState(false);
   const [pendingPick, setPendingPick]   = useState(null);
   const [timeLeft, setTimeLeft]         = useState(PICK_SECONDS);
+  const [scoringMember, setScoringMember] = useState('all');
   const feedRef  = useRef(null);
   const timerRef = useRef(null);
   const snapRef  = useRef(null);
@@ -851,8 +852,23 @@ export default function App() {
 
         {/* ── SCORING ── */}
         {tab===2 && (
-          <ScoringTab
-            allRosteredPlayers={allRosteredPlayers}
+          <div>
+            <div style={{ display:"flex", gap:8, marginBottom:18, flexWrap:"wrap" }}>
+              {["all",...members].map(m=>(
+                <button key={m} onClick={()=>setScoringMember(m)}
+                  style={{ fontSize:14, fontFamily:ss, padding:"7px 18px", borderRadius:24, cursor:"pointer",
+                    border:`0.5px solid ${M.greenMid}`,
+                    background:scoringMember===m?M.green:"none",
+                    color:scoringMember===m?M.gold:M.green,
+                    fontWeight:scoringMember===m?500:400 }}>
+                  {m==="all"?"All teams":m}
+                </button>
+              ))}
+            </div>
+            <ScoringTab
+              allRosteredPlayers={scoringMember==="all"
+                ? allRosteredPlayers
+                : (drafts[scoringMember]||[])}
             playerStats={playerStats}
             liveScores={liveScores}
             updateHole={updateHole}
@@ -863,6 +879,7 @@ export default function App() {
             liveError={liveError}
             lastUpdated={lastUpdated}
           />
+          </div>
         )}
 
         {/* ── LEADERBOARD ── */}
