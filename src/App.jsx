@@ -606,22 +606,22 @@ export default function App() {
   return (
     <div style={{ fontFamily:sf, color:M.text, background:M.cream }}>
       {/* Header */}
-      <div style={{ background:M.green, padding:"28px 32px 0" }}>
+      <div style={{ background:M.green, padding:"16px 16px 0" }}>
         <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:22 }}>
-          <div style={{ width:58, height:58, background:M.gold, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:32 }}>⛳</div>
+          <div style={{ width:42, height:42, background:M.gold, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>⛳</div>
           <div>
-            <div style={{ fontFamily:sf, fontSize:L.headerFontLg, color:M.gold, letterSpacing:"0.02em", lineHeight:1.1 }}>Family Fantasy Masters</div>
-            <div style={{ fontFamily:ss, fontSize:L.headerFontSm, color:"rgba(255,255,255,0.6)", letterSpacing:"0.08em", textTransform:"uppercase", marginTop:3 }}>Augusta National · April 2026</div>
+            <div style={{ fontFamily:sf, fontSize:"clamp(16px, 4vw, 28px)", color:M.gold, letterSpacing:"0.02em", lineHeight:1.1 }}>Family Fantasy Masters</div>
+            <div style={{ fontFamily:ss, fontSize:"clamp(10px, 2vw, 14px)", color:"rgba(255,255,255,0.6)", letterSpacing:"0.08em", textTransform:"uppercase", marginTop:3 }}>Augusta National · April 2026</div>
           </div>
         </div>
         <div style={{ display:"flex", gap:2 }}>
           {TABS.map((t,i)=>(
-            <button key={t} onClick={()=>setTab(i)} style={{ background:"none", border:"none", borderBottom:tab===i?`3px solid ${M.gold}`:"3px solid transparent", padding:"10px 24px", fontSize:L.tabFontSize, letterSpacing:"0.07em", textTransform:"uppercase", fontFamily:ss, fontWeight:tab===i?500:400, color:tab===i?M.gold:"rgba(255,255,255,0.55)", cursor:"pointer" }}>{t}</button>
+            <button key={t} onClick={()=>setTab(i)} style={{ background:"none", border:"none", borderBottom:tab===i?`3px solid ${M.gold}`:"3px solid transparent", padding:"8px 12px", fontSize:"clamp(10px, 2vw, 15px)", letterSpacing:"0.05em", textTransform:"uppercase", fontFamily:ss, fontWeight:tab===i?500:400, color:tab===i?M.gold:"rgba(255,255,255,0.55)", cursor:"pointer" }}>{t}</button>
           ))}
         </div>
       </div>
 
-      <div style={{ padding:28 }}>
+      <div style={{ padding:"16px" }}>
 
         {/* ── SETUP ── */}
         {tab===3 && (
