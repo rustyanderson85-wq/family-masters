@@ -657,7 +657,7 @@ export default function App() {
               ))}
             </div>
             <button onClick={startDraft} style={{ width:"100%", padding:"18px", fontSize:18, fontFamily:sf, background:M.green, color:M.gold, border:`1px solid ${M.gold}40`, borderRadius:10, cursor:"pointer" }}>
-              {draftStarted?"Draft in progress →":`Begin Draft · ${members.length} participants`}
+              {draftStarted?"Continue Draft →":`Begin Draft · ${members.length} participants`}
             {draftStarted && (
               <button onClick={()=>{
                 if(window.confirm("Reset the entire draft? This cannot be undone.")) {
