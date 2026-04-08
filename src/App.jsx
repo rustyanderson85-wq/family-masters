@@ -899,7 +899,7 @@ export default function App() {
                     <div key={p.id} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"7px 0", borderBottom:`0.5px solid ${M.border}` }}>
                       <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                         <div style={{ display:"flex", gap:4 }}>{reqs.map(rid=><Badge key={rid} reqId={rid} small />)}</div>
-                        <span style={{ fontSize:14, fontFamily:sf, color:M.text }}>{p.name}</span>
+                        <span onClick={()=>{ setScoringMember(member); setTab(1); }} style={{ fontSize:14, fontFamily:sf, color:M.green, cursor:"pointer", textDecoration:"underline", textDecorationColor:`${M.green}55` }}>{p.name}</span>
                       </div>
                       <span style={{ fontSize:14, fontWeight:500, fontFamily:ss, color:pPts>=0?M.green:"#8a2020" }}>{pPts>=0?"+":""}{pPts}</span>
                     </div>
