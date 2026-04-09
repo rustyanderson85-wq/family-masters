@@ -18,7 +18,7 @@ const DATA_SOURCE = "espn"; // "espn" | "pga" | "datagolf"
 const DATAGOLF_API_KEY = process.env.DATAGOLF_API_KEY || "";
 
 // Masters 2026 event IDs — verify these closer to tournament week
-const ESPN_EVENT_ID  = "401580350"; // update if needed
+const ESPN_EVENT_ID  = "401811941"; // update if needed
 const PGA_TOURNAMENT_ID = "R2026014"; // update if needed
 
 export default async function handler(req, res) {
