@@ -13,7 +13,7 @@
 //    3. git push — redeploys in 30 seconds
 // ─────────────────────────────────────────────────────────────
 
-const DATA_SOURCE = "espn"; // "espn" | "pga" | "datagolf"
+const DATA_SOURCE = "pga"; // "espn" | "pga" | "datagolf"
 
 const DATAGOLF_API_KEY = process.env.DATAGOLF_API_KEY || "";
 

@@ -454,18 +454,24 @@ export default function App() {
   const loadLiveData = useCallback(async () => {
     if (PROXY_URL==="YOUR_PROXY_URL") return;
     // Only fetch live player data during tournament week
-    const now = new Date(); const start = new Date("2026-04-10"); if (now < start) return;
+    // Tournament is live
     setLoadingLive(true); setLiveError(null);
     try {
       const res=await fetch(`${PROXY_URL}/api/masters?endpoint=leaderboard`);
       if (!res.ok) throw new Error("Failed");
       const data=await res.json();
       if (data.players?.length) {
-        setPlayers(data.players.map(p=>({ id:p.id, name:p.name, country:p.countryCode||"USA", odds:p.odds||"N/A",
+        // Keep SAMPLE_PLAYERS — just build live score lookup by name
           isFormerChamp:SAMPLE_PLAYERS.find(sp=>sp.name===p.name)?.isFormerChamp||false,
           isMastersRookie:SAMPLE_PLAYERS.find(sp=>sp.name===p.name)?.isMastersRookie||false })));
         const scores={};
-        data.players.forEach(p=>{ scores[p.id]={ score:p.score, scoreValue:p.scoreValue, rounds:p.rounds, status:p.status }; });
+        // Match by name since ESPN IDs differ from our IDs
+        const liveByName = {};
+        data.players.forEach(p => { liveByName[p.name.toLowerCase().trim()] = p; });
+        SAMPLE_PLAYERS.forEach(sp => {
+          const live = liveByName[sp.name.toLowerCase().trim()];
+          if (live) scores[sp.id] = { score:live.score, scoreValue:live.scoreValue, rounds:live.rounds, status:live.status, position:live.position };
+        });
         setLiveScores(scores); setLastUpdated(new Date());
       }
     } catch(e) { setLiveError("Could not reach live data."); }
