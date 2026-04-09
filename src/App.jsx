@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 const PROXY_URL = "https://family-masters.vercel.app";
 const REFRESH_MS = 5 * 60 * 1000;
 const TOTAL_PICKS = 4;
-const PICK_SECONDS = 150;
+const PICK_SECONDS = 300;
 
 const SCORING = { eagle:5, birdie:3, par:1, bogey:-1, double:-3, triple:-5, madeCut:5, lowRoundDrafted:2, lowRoundField:5 };
 
