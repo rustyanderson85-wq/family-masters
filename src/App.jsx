@@ -586,7 +586,7 @@ export default function App() {
     return {...prev,[pid]:{...cur,[rk]:rd}};
   });
   const toggleStat = (pid,stat) => setPlayerStats(prev=>{ const c=prev[pid]||{}; const next={...prev,[pid]:{...c,[stat]:!c[stat]}}; saveState({ members, drafts, draftOrder, currentPick, draftStarted, playerStats: next }); return next; });
-  const toggleLowRound = (pid,key) => setPlayerStats(prev=>{ const u={...prev}; Object.keys(u).forEach(id=>{if(u[id]?.[key])u[id]={...u[id],[key]:false};}); u[pid]={...(u[pid]||{}),[key]:!(prev[pid]?.[key])}; return u; });
+  const toggleLowRound = (pid,key) => setPlayerStats(prev=>{ const u={...prev}; u[pid]={...(u[pid]||{}),[key]:!(prev[pid]?.[key])}; return u; });
 
   const allRosteredPlayers = [...new Map(Object.values(drafts).flatMap(p=>(p||[])).map(p=>[p.id,p])).values()];
 
