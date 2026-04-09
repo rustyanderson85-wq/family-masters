@@ -414,6 +414,14 @@ const SAMPLE_PLAYERS = [
 ];
 
 const SAMPLE_MEMBERS = ["Daddy","Mommy","Luke","Brooklynn","Lexi","Pop","Mor Mor"];
+
+// Lexi's pre-assigned team — display names are fun, ids link to real players for scoring
+const LEXI_TEAM = [
+  { id:4,  name:"Rory Rory McIlroy",  country:"NIR", odds:"+1300", isFormerChamp:true,  isMastersRookie:false },
+  { id:20, name:"Sordin Beef",         country:"USA", odds:"+4500", isFormerChamp:true,  isMastersRookie:false },
+  { id:47, name:"Aaron Rai",           country:"ENG", odds:"+15000",isFormerChamp:false, isMastersRookie:true  },
+  { id:1,  name:"Scottie Scheffler",   country:"USA", odds:"+500",  isFormerChamp:true,  isMastersRookie:false },
+];
 const TABS = ["Leaderboard","Scoring","Draft","Setup"];
 
 // ── App ───────────────────────────────────────────────────────────────────────
@@ -497,7 +505,7 @@ export default function App() {
     const p=[];
     for (let r=0;r<TOTAL_PICKS;r++) {
       const o=r%2===0?draftOrder:[...draftOrder].reverse();
-      o.forEach(m=>p.push({member:m,round:r+1}));
+      o.forEach(m=>{ if(m!=="Lexi") p.push({member:m,round:r+1}); });
     }
     return p;
   })();
@@ -552,7 +560,7 @@ export default function App() {
   const startDraft = () => {
     const order=[...members].sort(()=>Math.random()-0.5);
     setDraftOrder(order); setDraftStarted(true); setCurrentPick(0);
-    setDrafts(Object.fromEntries(members.map(m=>[m,[]])));
+    setDrafts(Object.fromEntries(members.map(m=>[m, m==="Lexi" ? LEXI_TEAM : []])));
     setCommentary([]); setPendingPick(null); setTimeLeft(PICK_SECONDS); setTab(2);
     const order2 = [...members].sort(()=>Math.random()-0.5);
     saveState({ members, drafts: {}, draftOrder: order2, currentPick: 0, draftStarted: true, playerStats: {} });
