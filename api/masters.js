@@ -235,7 +235,7 @@ async function fetchDataGolf() {
       .filter(Boolean);
     return {
       id:          String(p.dg_id),
-      name:        p.player_name,
+      name:        p.player_name ? p.player_name.split(', ').reverse().join(' ') : '',
       countryCode: "USA",
       score:       p.current_score === 0 ? "E" : p.current_score > 0 ? `+${p.current_score}` : String(p.current_score),
       scoreValue:  p.current_score || 0,
