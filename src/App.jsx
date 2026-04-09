@@ -464,10 +464,11 @@ export default function App() {
         // Keep SAMPLE_PLAYERS — just build live score lookup by name
         const scores={};
         // Match by name since ESPN IDs differ from our IDs
+        const normalize = s => s.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const liveByName = {};
-        data.players.forEach(p => { liveByName[p.name.toLowerCase().trim()] = p; });
+        data.players.forEach(p => { liveByName[normalize(p.name)] = p; });
         SAMPLE_PLAYERS.forEach(sp => {
-          const live = liveByName[sp.name.toLowerCase().trim()];
+          const live = liveByName[normalize(sp.name)];
           if (live) scores[sp.id] = { score:live.score, scoreValue:live.scoreValue, rounds:live.rounds, status:live.status, position:live.position };
         });
         setLiveScores(scores); setLastUpdated(new Date());
