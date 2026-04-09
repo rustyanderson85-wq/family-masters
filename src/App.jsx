@@ -7,7 +7,7 @@ const PICK_SECONDS = 300;
 
 const SCORING = { eagle:5, birdie:3, par:1, bogey:-1, double:-3, triple:-5, madeCut:5, lowRoundDrafted:2, lowRoundField:5 };
 
-const AUGUSTA_PARS = [4,5,4,3,4,5,4,3,4, 4,4,3,4,5,3,4,3,4];
+const AUGUSTA_PARS = [4,5,4,3,4,3,4,5,4, 4,4,3,5,4,5,3,4,4];
 const FRONT_PAR = 36;
 const BACK_PAR  = 36;
 const TOTAL_PAR = 72;
