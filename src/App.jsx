@@ -471,6 +471,27 @@ export default function App() {
           if (live) scores[sp.id] = { score:live.score, scoreValue:live.scoreValue, rounds:live.rounds, status:live.status, position:live.position };
         });
         setLiveScores(scores); setLastUpdated(new Date());
+        // Merge live hole data into playerStats (don't overwrite manually-toggled stats)
+        setPlayerStats(prev => {
+          const next = { ...prev };
+          Object.entries(scores).forEach(([pid, live]) => {
+            const cur = next[pid] || {};
+            const updated = { ...cur };
+            (live.rounds || []).forEach(rd => {
+              const rk = `r${rd.round}`;
+              const holes = rd.holes || {};
+              if (Object.keys(holes).length > 0) {
+                // Merge holes, preserve manual stat flags (non-hole keys)
+                const existing = cur[rk] || {};
+                const merged = { ...existing };
+                Object.entries(holes).forEach(([hk, val]) => { merged[hk] = val; });
+                updated[rk] = merged;
+              }
+            });
+            next[pid] = updated;
+          });
+          return next;
+        });
       }
     } catch(e) { setLiveError("Could not reach live data."); }
     finally { setLoadingLive(false); }
