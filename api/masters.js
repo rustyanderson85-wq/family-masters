@@ -295,7 +295,7 @@ async function fetchSportsData() {
     const totalVsPar = p.TotalToPar || 0;
     return {
       id: String(p.PlayerID),
-      name: `${p.FirstName} ${p.LastName}`.trim(),
+      name: (p.Name || `${p.FirstName || ""} ${p.LastName || ""}`).trim(),
       countryCode: p.Country || "USA",
       score: totalVsPar === 0 ? "E" : totalVsPar > 0 ? `+${totalVsPar}` : String(totalVsPar),
       scoreValue: totalVsPar,
