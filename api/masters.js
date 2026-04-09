@@ -227,7 +227,7 @@ async function fetchDataGolf() {
   // Fetch live scores + live tournament stats (which has hole-by-hole) in parallel
   const [liveRes, statsRes] = await Promise.all([
     fetch(`https://feeds.datagolf.com/preds/in-play?tour=pga&dead_heat=no&odds_format=american&key=${DATAGOLF_API_KEY}`),
-    fetch(`https://feeds.datagolf.com/preds/live-tournament-stats?tour=pga&stats=sg_putt,sg_arg,sg_app,sg_ott&round=event_cumulative&display=value&file_format=json&key=${DATAGOLF_API_KEY}`)
+    fetch(`https://feeds.datagolf.com/preds/live-hole-stats?tour=pga&file_format=json&key=${DATAGOLF_API_KEY}`)
   ]);
 
   if (!liveRes.ok) throw new Error(`Data Golf live API returned ${liveRes.status}`);
@@ -238,8 +238,8 @@ async function fetchDataGolf() {
   if (statsRes.ok) {
     try {
       const stats = await statsRes.json();
-      console.log('[datagolf] stats keys:', Object.keys(stats).join(','));
-      console.log('[datagolf] stats sample:', JSON.stringify(stats).slice(0,500));
+      console.log('[datagolf] hole keys:', Object.keys(stats).join(','));
+      console.log('[datagolf] hole sample:', JSON.stringify(stats).slice(0,800));
     } catch(e) {
       console.log('Stats parse error:', e.message);
     }
