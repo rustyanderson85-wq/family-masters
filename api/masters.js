@@ -224,33 +224,24 @@ async function fetchPGATour() {
 async function fetchDataGolf() {
   if (!DATAGOLF_API_KEY) throw new Error("DATAGOLF_API_KEY not set in environment variables");
 
-  // Fetch both live scores and hole-by-hole data in parallel
-  const [liveRes, holeRes] = await Promise.all([
+  // Fetch live scores + live tournament stats (which has hole-by-hole) in parallel
+  const [liveRes, statsRes] = await Promise.all([
     fetch(`https://feeds.datagolf.com/preds/in-play?tour=pga&dead_heat=no&odds_format=american&key=${DATAGOLF_API_KEY}`),
-    fetch(`https://feeds.datagolf.com/preds/live-hole-scores?tour=pga&file_format=json&key=${DATAGOLF_API_KEY}`)
+    fetch(`https://feeds.datagolf.com/preds/live-tournament-stats?tour=pga&stats=sg_putt,sg_arg,sg_app,sg_ott&round=event_cumulative&display=value&file_format=json&key=${DATAGOLF_API_KEY}`)
   ]);
 
   if (!liveRes.ok) throw new Error(`Data Golf live API returned ${liveRes.status}`);
   const live = await liveRes.json();
 
-  // Parse hole scores if available
+  // Try to get hole data from live stats
   const holeData = {};
-  if (holeRes.ok) {
+  if (statsRes.ok) {
     try {
-      const holes = await holeRes.json();
-      // Data Golf hole scores format: { data: [{ player_name, course, round, hole_scores: [{ hole, score, par }] }] }
-      (holes.data || holes || []).forEach(entry => {
-        const name = entry.player_name ? entry.player_name.split(', ').reverse().join(' ') : '';
-        if (!holeData[name]) holeData[name] = {};
-        const roundNum = entry.round || 1;
-        const holeScores = {};
-        (entry.hole_scores || []).forEach(h => {
-          if (h.score != null && h.score > 0) holeScores[`h${h.hole}`] = h.score;
-        });
-        if (Object.keys(holeScores).length > 0) holeData[name][`r${roundNum}`] = holeScores;
-      });
+      const stats = await statsRes.json();
+      console.log('[datagolf] stats keys:', Object.keys(stats).join(','));
+      console.log('[datagolf] stats sample:', JSON.stringify(stats).slice(0,500));
     } catch(e) {
-      console.log('Hole data parse error:', e.message);
+      console.log('Stats parse error:', e.message);
     }
   }
 
