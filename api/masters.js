@@ -122,18 +122,30 @@ function parseESPNScoreboard(event) {
   return competitors.map(c => {
     const rounds = (c.linescores || []).map((r, i) => ({
       round:  r.period || (i + 1),
-      holes:  {}, // scoreboard endpoint doesn't include holes
+      holes:  {},
       score:  r.value,
       vspar:  r.displayValue,
     }));
+    // Parse score correctly — ESPN stores as strokes under par (negative = under)
+    const rawScore = c.score?.value ?? c.score?.displayValue ?? 0;
+    const scoreNum = typeof rawScore === "string" ? parseInt(rawScore) || 0 : rawScore;
+    const scoreDisplay = scoreNum === 0 ? "E" : scoreNum > 0 ? `+${scoreNum}` : String(scoreNum);
+    // Use vspar from linescores to get actual to-par score
+    const totalVsPar = (c.linescores || []).reduce((sum, r) => {
+      const v = r.displayValue;
+      if (!v || v === "-") return sum;
+      if (v === "E") return sum;
+      return sum + (parseInt(v) || 0);
+    }, 0);
+    const totalDisplay = totalVsPar === 0 ? "E" : totalVsPar > 0 ? `+${totalVsPar}` : String(totalVsPar);
     return {
       id:          String(c.id || c.athlete?.id),
       name:        c.athlete?.displayName || c.athlete?.fullName,
       countryCode: c.athlete?.countryCode || "USA",
-      score:       c.score?.displayValue ?? "E",
-      scoreValue:  c.score?.value ?? 0,
+      score:       totalDisplay,
+      scoreValue:  totalVsPar,
       status:      c.status?.type?.name || "active",
-      position:    c.status?.position?.displayText || "",
+      position:    c.status?.position?.displayText || c.status?.displayValue || "",
       rounds,
     };
   }).filter(p => p.name);
