@@ -224,18 +224,49 @@ async function fetchPGATour() {
 async function fetchDataGolf() {
   if (!DATAGOLF_API_KEY) throw new Error("DATAGOLF_API_KEY not set in environment variables");
 
-  const url = `https://feeds.datagolf.com/preds/in-play?tour=pga&dead_heat=no&odds_format=american&key=${DATAGOLF_API_KEY}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Data Golf API returned ${res.status}`);
-  const live = await res.json();
+  // Fetch both live scores and hole-by-hole data in parallel
+  const [liveRes, holeRes] = await Promise.all([
+    fetch(`https://feeds.datagolf.com/preds/in-play?tour=pga&dead_heat=no&odds_format=american&key=${DATAGOLF_API_KEY}`),
+    fetch(`https://feeds.datagolf.com/preds/live-hole-scores?tour=pga&file_format=json&key=${DATAGOLF_API_KEY}`)
+  ]);
+
+  if (!liveRes.ok) throw new Error(`Data Golf live API returned ${liveRes.status}`);
+  const live = await liveRes.json();
+
+  // Parse hole scores if available
+  const holeData = {};
+  if (holeRes.ok) {
+    try {
+      const holes = await holeRes.json();
+      // Data Golf hole scores format: { data: [{ player_name, course, round, hole_scores: [{ hole, score, par }] }] }
+      (holes.data || holes || []).forEach(entry => {
+        const name = entry.player_name ? entry.player_name.split(', ').reverse().join(' ') : '';
+        if (!holeData[name]) holeData[name] = {};
+        const roundNum = entry.round || 1;
+        const holeScores = {};
+        (entry.hole_scores || []).forEach(h => {
+          if (h.score != null && h.score > 0) holeScores[`h${h.hole}`] = h.score;
+        });
+        if (Object.keys(holeScores).length > 0) holeData[name][`r${roundNum}`] = holeScores;
+      });
+    } catch(e) {
+      console.log('Hole data parse error:', e.message);
+    }
+  }
 
   const players = (live.data || []).map(p => {
+    const playerName = p.player_name ? p.player_name.split(', ').reverse().join(' ') : '';
+    const playerHoles = holeData[playerName] || {};
     const rounds = ["R1","R2","R3","R4"]
-      .map((key, i) => p[key] != null ? { round: i+1, holes: {}, score: p[key], vspar: null } : null)
+      .map((key, i) => {
+        if (p[key] == null) return null;
+        const rKey = `r${i+1}`;
+        return { round: i+1, holes: playerHoles[rKey] || {}, score: p[key], vspar: null };
+      })
       .filter(Boolean);
     return {
       id:          String(p.dg_id),
-      name:        p.player_name ? p.player_name.split(', ').reverse().join(' ') : '',
+      name:        playerName,
       countryCode: "USA",
       score:       p.current_score === 0 ? "E" : p.current_score > 0 ? `+${p.current_score}` : String(p.current_score),
       scoreValue:  p.current_score || 0,
