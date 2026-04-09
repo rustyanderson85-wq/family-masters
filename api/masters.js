@@ -13,9 +13,10 @@
 //    3. git push — redeploys in 30 seconds
 // ─────────────────────────────────────────────────────────────
 
-const DATA_SOURCE = "datagolf"; // "espn" | "pga" | "datagolf"
+const DATA_SOURCE = "sportsdata"; // "espn" | "pga" | "datagolf" | "sportsdata"
 
 const DATAGOLF_API_KEY = process.env.DATAGOLF_API_KEY || "";
+const SPORTSDATA_API_KEY = process.env.SPORTSDATA_API_KEY || "";
 
 // Masters 2026 event IDs — verify these closer to tournament week
 const ESPN_EVENT_ID  = "401811941"; // update if needed
@@ -29,7 +30,9 @@ export default async function handler(req, res) {
   try {
     let data;
 
-    if (DATA_SOURCE === "datagolf") {
+    if (DATA_SOURCE === "sportsdata") {
+      data = await fetchSportsData();
+    } else if (DATA_SOURCE === "datagolf") {
       data = await fetchDataGolf();
     } else if (DATA_SOURCE === "pga") {
       data = await fetchPGATour();
