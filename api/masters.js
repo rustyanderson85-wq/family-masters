@@ -287,14 +287,17 @@ async function fetchSportsData() {
   const players = (data.Players || []).map(p => {
     const rounds = (p.Rounds || []).map((rd, i) => {
       const holes = {};
+      let vspar = 0;
       (rd.Holes || []).forEach(h => {
-        if (h.Score != null && h.Score > 0) holes[`h${h.Number}`] = h.Score;
+        if (h.Score != null) {
+          holes[`h${h.Number}`] = h.Score;
+          vspar += (h.ToPar || 0);
+        }
       });
-      return { round: rd.Number || (i+1), holes, score: rd.Score || 0, vspar: rd.ToPar || 0 };
+      const hasHoles = Object.keys(holes).length > 0;
+      return { round: rd.Number || (i+1), holes, score: rd.Score || 0, vspar: hasHoles ? vspar : (rd.ToPar || 0) };
     });
-    const totalVsPar = p.Rounds
-      ? p.Rounds.filter(r => r.Score && r.Par).reduce((sum, r) => sum + (r.Score - r.Par), 0)
-      : 0;
+    const totalVsPar = rounds.reduce((sum, r) => sum + r.vspar, 0);
     return {
       id: String(p.PlayerID),
       name: (p.Name || `${p.FirstName || ""} ${p.LastName || ""}`).trim(),
