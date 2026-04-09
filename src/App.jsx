@@ -512,7 +512,7 @@ export default function App() {
 
   const curPick        = draftStarted && !(currentPick>=allPicks.length && allPicks.length>0) ? allPicks[currentPick] : null;
   const isDraftComplete= draftStarted && allPicks.length>0 && currentPick>=allPicks.length;
-  const draftedIds     = new Set(Object.values(drafts).flatMap(arr=>(arr||[]).map(p=>p.id)));
+  const draftedIds     = new Set(Object.values(drafts).flatMap((arr,idx) => { const member = Object.keys(drafts)[idx]; return member==="Lexi" ? [] : (arr||[]).map(p=>p.id); }));
   const curMemberPicks = curPick ? (drafts[curPick.member]||[]) : [];
 
   snapRef.current = { curPick, isDraftComplete, drafts, players, curMemberPicks, currentPick };
