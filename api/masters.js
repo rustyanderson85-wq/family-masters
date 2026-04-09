@@ -272,3 +272,39 @@ async function fetchDataGolf() {
 
   return { players, source: "datagolf", hasHoleData: false, updatedAt: new Date().toISOString() };
 }
+
+async function fetchSportsData() {
+  const key = process.env.SPORTSDATA_API_KEY;
+  if (!key) throw new Error("SPORTSDATA_API_KEY not set");
+
+  const res = await fetch(`https://api.sportsdata.io/golf/v2/json/Leaderboard/58?key=${key}`);
+  if (!res.ok) throw new Error(`SportsData returned ${res.status}`);
+  const data = await res.json();
+
+  console.log('[sportsdata] keys:', Object.keys(data).join(','));
+  console.log('[sportsdata] sample:', JSON.stringify(data).slice(0, 500));
+
+  const players = (data.Players || []).map(p => {
+    const rounds = (p.Rounds || []).map((rd, i) => {
+      const holes = {};
+      (rd.Holes || []).forEach(h => {
+        if (h.Score != null && h.Score > 0) holes[`h${h.Number}`] = h.Score;
+      });
+      return { round: rd.Number || (i+1), holes, score: rd.Score || 0, vspar: rd.ToPar || 0 };
+    });
+    const totalVsPar = p.TotalToPar || 0;
+    return {
+      id: String(p.PlayerID),
+      name: `${p.FirstName} ${p.LastName}`.trim(),
+      countryCode: p.Country || "USA",
+      score: totalVsPar === 0 ? "E" : totalVsPar > 0 ? `+${totalVsPar}` : String(totalVsPar),
+      scoreValue: totalVsPar,
+      status: "active",
+      position: String(p.Rank || ""),
+      rounds,
+    };
+  }).filter(p => p.name.trim());
+
+  const hasHoleData = players.some(p => p.rounds.some(r => Object.keys(r.holes).length > 0));
+  return { players, source: "sportsdata", hasHoleData, updatedAt: new Date().toISOString() };
+}
