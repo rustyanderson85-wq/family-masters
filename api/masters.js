@@ -277,7 +277,7 @@ async function fetchSportsData() {
   const key = process.env.SPORTSDATA_API_KEY;
   if (!key) throw new Error("SPORTSDATA_API_KEY not set");
 
-  const res = await fetch(`https://api.sportsdata.io/golf/v2/json/Leaderboard/58?key=${key}`);
+  const res = await fetch(`https://api.sportsdata.io/golf/v2/json/Leaderboard/688?key=${key}`);
   if (!res.ok) throw new Error(`SportsData returned ${res.status}`);
   const data = await res.json();
 
