@@ -457,7 +457,7 @@ export default function App() {
     // Tournament is live
     setLoadingLive(true); setLiveError(null);
     try {
-      const res=await fetch(`${PROXY_URL}/api/masters?endpoint=leaderboard`);
+      const res=await fetch(`${PROXY_URL}/api/masters`);
       if (!res.ok) throw new Error("Failed");
       const data=await res.json();
       if (data.players?.length) {
