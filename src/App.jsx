@@ -462,8 +462,6 @@ export default function App() {
       const data=await res.json();
       if (data.players?.length) {
         // Keep SAMPLE_PLAYERS — just build live score lookup by name
-          isFormerChamp:SAMPLE_PLAYERS.find(sp=>sp.name===p.name)?.isFormerChamp||false,
-          isMastersRookie:SAMPLE_PLAYERS.find(sp=>sp.name===p.name)?.isMastersRookie||false })));
         const scores={};
         // Match by name since ESPN IDs differ from our IDs
         const liveByName = {};
