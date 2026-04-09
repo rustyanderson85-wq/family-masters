@@ -112,7 +112,7 @@ function parseESPNSummary(raw) {
       scoreValue:  c.score?.value ?? 0,
       status:      c.status?.type?.name || "active",
       position:    c.status?.position?.displayText || c.position || "",
-      rounds,
+      rounds: parsedRounds,
     };
   }).filter(p => p.name);
 }
@@ -130,14 +130,37 @@ function parseESPNScoreboard(event) {
     const rawScore = c.score?.value ?? c.score?.displayValue ?? 0;
     const scoreNum = typeof rawScore === "string" ? parseInt(rawScore) || 0 : rawScore;
     const scoreDisplay = scoreNum === 0 ? "E" : scoreNum > 0 ? `+${scoreNum}` : String(scoreNum);
-    // Use vspar from linescores to get actual to-par score
-    const totalVsPar = (c.linescores || []).reduce((sum, r) => {
-      const v = r.displayValue;
-      if (!v || v === "-") return sum;
-      if (v === "E") return sum;
-      return sum + (parseInt(v) || 0);
-    }, 0);
+    // Parse overall score from linescores
+    const linescores = c.linescores || [];
+    let totalVsPar = 0;
+    let hasScore = false;
+    linescores.forEach(r => {
+      const v = r.displayValue || r.value;
+      if (!v || v === "-" || v === "") return;
+      hasScore = true;
+      if (v === "E" || v === "0") return;
+      totalVsPar += parseInt(v) || 0;
+    });
+    // Also try the direct score value
+    if (!hasScore && c.score?.displayValue) {
+      const sv = c.score.displayValue;
+      if (sv === "E") totalVsPar = 0;
+      else totalVsPar = parseInt(sv) || 0;
+    }
     const totalDisplay = totalVsPar === 0 ? "E" : totalVsPar > 0 ? `+${totalVsPar}` : String(totalVsPar);
+    
+    // Parse rounds — use vspar string directly
+    const parsedRounds = (c.linescores || []).map((r, i) => {
+      const vsparStr = r.displayValue || "";
+      const vsparNum = vsparStr === "E" ? 0 : (parseInt(vsparStr) || 0);
+      return {
+        round: r.period || (i + 1),
+        holes: {},
+        score: r.value || 0,
+        vspar: vsparStr,
+        vsparNum,
+      };
+    });
     return {
       id:          String(c.id || c.athlete?.id),
       name:        c.athlete?.displayName || c.athlete?.fullName,
@@ -146,7 +169,7 @@ function parseESPNScoreboard(event) {
       scoreValue:  totalVsPar,
       status:      c.status?.type?.name || "active",
       position:    c.status?.position?.displayText || c.status?.displayValue || "",
-      rounds,
+      rounds: parsedRounds,
     };
   }).filter(p => p.name);
 }
