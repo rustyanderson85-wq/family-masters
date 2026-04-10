@@ -441,6 +441,7 @@ export default function App() {
   const [draftStarted, setDraftStarted] = useState(false);
   const [players, setPlayers]           = useState(SAMPLE_PLAYERS);
   const [liveScores, setLiveScores]     = useState({});
+  const [fullField, setFullField]         = useState([]);
   const [lastUpdated, setLastUpdated]   = useState(null);
   const [loadingLive, setLoadingLive]   = useState(false);
   const [liveError, setLiveError]       = useState(null);
@@ -476,6 +477,7 @@ export default function App() {
           if (live) scores[sp.id] = { score:live.score, scoreValue:live.scoreValue, rounds:live.rounds, status:live.status, position:live.position };
         });
         setLiveScores(scores); setLastUpdated(new Date());
+        setFullField(data.players);
         // Merge live hole data into playerStats (don't overwrite manually-toggled stats)
         setPlayerStats(prev => {
           const next = { ...prev };
@@ -944,11 +946,12 @@ export default function App() {
                   <span style={{ fontSize:22, fontWeight:500, color:isLeader?(pts>=0?M.gold:"#f08080"):(pts>=0?M.green:"#8a2020"), fontFamily:ss }}>{pts>=0?"+":""}{pts}</span>
                 </div>
                 <div style={{ padding:"8px 18px 14px" }}>
-                  {picks.map(p=>{ const reqs=[...playerReqs(p)]; const pPts=calcPoints(playerStats[p.id]); return (
+                  {picks.map(p=>{ const reqs=[...playerReqs(p)]; const pPts=calcPointsForMember(playerStats[p.id],member); const live=liveScores[p.id]; return (
                     <div key={p.id} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"7px 0", borderBottom:`0.5px solid ${M.border}` }}>
                       <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                         <div style={{ display:"flex", gap:4 }}>{reqs.map(rid=><Badge key={rid} reqId={rid} small />)}</div>
                         <span onClick={()=>{ setScoringMember(member); setTab(1); }} style={{ fontSize:14, fontFamily:sf, color:M.green, cursor:"pointer", textDecoration:"underline", textDecorationColor:`${M.green}55` }}>{p.name}</span>
+                        {live && <span style={{ fontSize:12, fontFamily:ss, color:M.textSoft }}>{live.score}</span>}
                       </div>
                       <span style={{ fontSize:14, fontWeight:500, fontFamily:ss, color:pPts>=0?M.green:"#8a2020" }}>{pPts>=0?"+":""}{pPts}</span>
                     </div>
@@ -956,6 +959,29 @@ export default function App() {
                 </div>
               </div>
             );})}
+            {fullField.length > 0 && (
+              <div style={{ background:M.white, border:`0.5px solid ${M.border}`, borderRadius:10, overflow:"hidden", marginTop:8, marginBottom:12 }}>
+                <div style={{ background:M.green, padding:"12px 18px" }}>
+                  <span style={{ fontFamily:sf, fontSize:16, color:M.gold }}>Masters Leaderboard</span>
+                </div>
+                <div style={{ padding:"8px 0" }}>
+                  {fullField.map((p,i) => {
+                    const normalize = s => s.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                    const drafted = Object.values(drafts).some(team => (team||[]).some(dp => normalize(dp.name) === normalize(p.name)));
+                    return (
+                      <div key={p.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"6px 18px", borderBottom:`0.5px solid ${M.border}`, background:i%2===0?M.white:M.cream }}>
+                        <span style={{ fontSize:12, fontFamily:ss, color:M.textSoft, minWidth:24, textAlign:"right" }}>{p.position}</span>
+                        <span style={{ fontSize:14, fontFamily:sf, color:M.green, flex:1 }}>{p.name}{!drafted && <span style={{ color:M.textSoft }}> *</span>}</span>
+                        <span style={{ fontSize:14, fontWeight:500, fontFamily:ss, color:p.scoreValue<0?M.green:p.scoreValue>0?"#8a2020":M.textMid }}>{p.score}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ padding:"8px 18px", borderTop:`0.5px solid ${M.border}` }}>
+                  <span style={{ fontSize:11, fontFamily:ss, color:M.textSoft }}>* not drafted</span>
+                </div>
+              </div>
+            )}
             <div style={{ background:M.white, border:`0.5px solid ${M.border}`, borderRadius:10, padding:"14px 18px", marginTop:8 }}>
               <div style={{ fontFamily:sf, fontSize:16, color:M.green, marginBottom:10 }}>Scoring reference</div>
               <div style={{ display:"flex", flexWrap:"wrap", gap:"6px 20px" }}>
