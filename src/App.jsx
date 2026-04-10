@@ -607,7 +607,17 @@ export default function App() {
     saveState({ members, drafts: newDrafts, draftOrder, currentPick: currentPick+1, draftStarted, playerStats });
   };
 
-  const getTeamPoints = (m) => (drafts[m]||[]).reduce((s,p)=>s+calcPoints(playerStats[p.id]),0);
+  const calcPointsForMember = (stats, member) => {
+    if (!stats) return 0;
+    let pts = 0;
+    for (let r=1;r<=4;r++) pts += calcRoundPoints(stats[`r${r}`]||{});
+    pts += (stats.madeCut?SCORING.madeCut:0);
+    if (member !== "Lexi") {
+      for (let r=1;r<=4;r++) pts += (stats[`lowRoundDrafted_r${r}`]?SCORING.lowRoundDrafted:0)+(stats[`lowRoundField_r${r}`]?SCORING.lowRoundField:0);
+    }
+    return pts;
+  };
+  const getTeamPoints = (m) => (drafts[m]||[]).reduce((s,p)=>s+calcPointsForMember(playerStats[p.id],m),0);
   const leaderboard = [...members].sort((a,b)=>getTeamPoints(b)-getTeamPoints(a));
 
   const updateHole = (pid,r,h,val) => setPlayerStats(prev=>{
@@ -616,7 +626,7 @@ export default function App() {
     return {...prev,[pid]:{...cur,[rk]:rd}};
   });
   const toggleStat = (pid,stat) => setPlayerStats(prev=>{ const c=prev[pid]||{}; const next={...prev,[pid]:{...c,[stat]:!c[stat]}}; saveState({ members, drafts, draftOrder, currentPick, draftStarted, playerStats: next }); return next; });
-  const toggleLowRound = (pid,key) => setPlayerStats(prev=>{ const u={...prev}; u[pid]={...(u[pid]||{}),[key]:!(prev[pid]?.[key])}; return u; });
+  const toggleLowRound = (pid,key) => setPlayerStats(prev=>{ const u={...prev}; u[pid]={...(u[pid]||{}),[key]:!(prev[pid]?.[key])}; saveState({ members, drafts, draftOrder, currentPick, draftStarted, playerStats: u }); return u; });
 
   const allRosteredPlayers = [...new Map(Object.values(drafts).flatMap(p=>(p||[])).map(p=>[p.id,p])).values()];
 
