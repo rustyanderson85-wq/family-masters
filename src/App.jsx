@@ -935,7 +935,8 @@ export default function App() {
 
         {/* ── LEADERBOARD ── */}
         {tab===0 && (
-          <div>
+          <div style={{ display:'flex', gap:18, alignItems:'flex-start', flexWrap:'wrap' }}>
+            <div style={{ flex:'1 1 340px', minWidth:0 }}>
             {leaderboard.map((member,i)=>{ const pts=getTeamPoints(member); const picks=drafts[member]||[]; const isLeader=i===0; return (
               <div key={member} style={{ background:M.white, border:`${isLeader?"1.5px":"0.5px"} solid ${isLeader?M.gold:M.border}`, borderRadius:10, overflow:"hidden", marginBottom:12 }}>
                 <div style={{ background:isLeader?M.green:M.cream, padding:"12px 18px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -959,8 +960,10 @@ export default function App() {
                 </div>
               </div>
             );})}
+            </div>
             {fullField.length > 0 && (
-              <div style={{ background:M.white, border:`0.5px solid ${M.border}`, borderRadius:10, overflow:"hidden", marginTop:8, marginBottom:12 }}>
+              <div style={{ flex:'1 1 280px', minWidth:0 }}>
+              <div style={{ background:M.white, border:`0.5px solid ${M.border}`, borderRadius:10, overflow:"hidden", marginBottom:12 }}>
                 <div style={{ background:M.green, padding:"12px 18px" }}>
                   <span style={{ fontFamily:sf, fontSize:16, color:M.gold }}>Masters Leaderboard</span>
                 </div>
@@ -981,8 +984,9 @@ export default function App() {
                   <span style={{ fontSize:11, fontFamily:ss, color:M.textSoft }}>* not drafted</span>
                 </div>
               </div>
+              </div>
             )}
-            <div style={{ background:M.white, border:`0.5px solid ${M.border}`, borderRadius:10, padding:"14px 18px", marginTop:8 }}>
+            <div style={{ background:M.white, border:`0.5px solid ${M.border}`, borderRadius:10, padding:"14px 18px", marginTop:8, flex:'1 1 100%' }}>
               <div style={{ fontFamily:sf, fontSize:16, color:M.green, marginBottom:10 }}>Scoring reference</div>
               <div style={{ display:"flex", flexWrap:"wrap", gap:"6px 20px" }}>
                 {[["Eagle","+5"],["Birdie","+3"],["Par","+1"],["Bogey","−1"],["Double","−3"],["Triple+","−5"],["Cut","+5"],["Low (drafted)","+2"],["Low (field)","+5"]].map(([l,v])=>(
