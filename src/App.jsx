@@ -100,7 +100,8 @@ function calcPoints(stats) {
   if (!stats) return 0;
   let pts = 0;
   for (let r=1;r<=4;r++) pts += calcRoundPoints(stats[`r${r}`]||{});
-  pts += (stats.madeCut?SCORING.madeCut:0)+(stats.lowRoundDrafted?SCORING.lowRoundDrafted:0)+(stats.lowRoundField?SCORING.lowRoundField:0);
+  pts += (stats.madeCut?SCORING.madeCut:0);
+  for (let r=1;r<=4;r++) pts += (stats[`lowRoundDrafted_r${r}`]?SCORING.lowRoundDrafted:0)+(stats[`lowRoundField_r${r}`]?SCORING.lowRoundField:0);
   return pts;
 }
 
@@ -116,7 +117,7 @@ const Badge = ({reqId, small=false}) => {
 
 // ── ScoringTab component ──────────────────────────────────────────────────────
 
-function ScoringTab({ allRosteredPlayers, playerStats, liveScores, updateHole, toggleStat, toggleLowRound, loadLiveData, loadingLive, liveError, lastUpdated }) {
+function ScoringTab({ allRosteredPlayers, playerStats, liveScores, updateHole, toggleStat, toggleLowRound, loadLiveData, loadingLive, liveError, lastUpdated, scoringMember }) {
   const today = new Date();
   const mastersStart = new Date("2026-04-09");
   const dayOffset = Math.floor((today - mastersStart) / (1000*60*60*24));
@@ -299,13 +300,16 @@ function ScoringTab({ allRosteredPlayers, playerStats, liveScores, updateHole, t
 
             {/* Bonus toggles */}
             <div style={{ display:"flex", gap:10, padding:"12px 16px", background:M.cream, borderTop:`0.5px solid ${M.border}` }}>
-              {[["Made cut","madeCut","#6a3a9a",false],["Low round (drafted)","lowRoundDrafted","#2a5a8a",true],["Low round (field)","lowRoundField",M.green,true]].map(([label,key,color,excl]) => {
+              {[["Made cut","madeCut","#6a3a9a",false],["Low round (drafted)","lowRoundDrafted","#2a5a8a",true],["Low round (field)","lowRoundField",M.green,true]].map(([label,baseKey,color,isRoundBonus]) => {
+                if (isRoundBonus && scoringMember === "Lexi") return null;
+                const key = isRoundBonus ? `${baseKey}_r${activeR}` : baseKey;
                 const active = stats[key];
-                const ptVal = key==="lowRoundDrafted"?SCORING.lowRoundDrafted:key==="lowRoundField"?SCORING.lowRoundField:SCORING.madeCut;
+                const ptVal = baseKey==="lowRoundDrafted"?SCORING.lowRoundDrafted:baseKey==="lowRoundField"?SCORING.lowRoundField:SCORING.madeCut;
+                const roundLabel = isRoundBonus ? ` R${activeR}` : "";
                 return (
-                  <button key={key} onClick={()=>excl?toggleLowRound(player.id,key):toggleStat(player.id,key)}
+                  <button key={key} onClick={()=>isRoundBonus?toggleLowRound(player.id,key):toggleStat(player.id,key)}
                     style={{ flex:1, padding:"9px 6px", fontSize:13, fontFamily:ss, background:active?color:M.white, color:active?M.white:color, border:`0.5px solid ${color}`, borderRadius:7, cursor:"pointer" }}>
-                    {label} {active?`✓ +${ptVal}`:`+${ptVal}`}
+                    {label}{roundLabel} {active?`✓ +${ptVal}`:`+${ptVal}`}
                   </button>
                 );
               })}
@@ -900,6 +904,7 @@ export default function App() {
               ))}
             </div>
             <ScoringTab
+              scoringMember={scoringMember}
               allRosteredPlayers={scoringMember==="all"
                 ? allRosteredPlayers
                 : (drafts[scoringMember]||[])}
